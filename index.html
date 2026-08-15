@@ -22,7 +22,6 @@
                 color: #f5f5f5;
                 margin: 0;
                 padding: 0;
-                /* overflow removed so the fixed menu can escape the 72 px box */
             }
 
             .banner {
@@ -101,16 +100,25 @@
                 font-weight: 700;
             }
 
-            /* Socials */
-            .socials {
+            /* Shared strip for socials OR apps — takes remaining space */
+            .strip {
                 display: flex;
                 align-items: center;
                 gap: 7px;
                 margin-left: auto;
-                flex-shrink: 1;
+                flex: 1 1 auto;
                 min-width: 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
             }
 
+            .strip::-webkit-scrollbar {
+                display: none;
+            }
+
+            /* Social pills */
             .social {
                 display: flex;
                 align-items: center;
@@ -160,13 +168,47 @@
                 text-overflow: ellipsis;
             }
 
-            /* ===== APPS button ===== */
-            .apps-dropdown {
-                position: relative;
-                flex-shrink: 0;
+            /* App pills — distribute available space */
+            .app {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                color: #eee;
+                background: #1a1a1a;
+                border: 1px solid #2c2c2c;
+                border-radius: 50px;
+                padding: 6px 11px;
+                font-size: 0.7rem;
+                font-weight: 600;
+                white-space: nowrap;
+                flex: 1 1 auto;
+                min-width: 0;
+                max-width: 140px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                transition:
+                    border-color 0.15s,
+                    background 0.15s,
+                    color 0.15s,
+                    transform 0.15s;
             }
 
-            .apps-btn {
+            .app:hover {
+                border-color: #ff8c00;
+                background: #222;
+                color: #ff8c00;
+                transform: translateY(-1px);
+            }
+
+            .app.soon {
+                opacity: 0.55;
+                pointer-events: none;
+                border-style: dashed;
+            }
+
+            /* Toggle button */
+            .toggle-btn {
                 display: inline-flex;
                 align-items: center;
                 gap: 5px;
@@ -184,74 +226,23 @@
                     transform 0.15s,
                     box-shadow 0.15s;
                 font-family: inherit;
+                flex-shrink: 0;
             }
 
-            .apps-btn:hover,
-            .apps-dropdown.open .apps-btn {
+            .toggle-btn:hover {
                 transform: translateY(-1px);
                 box-shadow: 0 5px 16px rgba(255, 140, 0, 0.4);
             }
 
-            .apps-btn svg {
+            .toggle-btn svg {
                 width: 12px;
                 height: 12px;
                 fill: currentColor;
                 transition: transform 0.2s;
             }
 
-            .apps-dropdown.open .apps-btn svg {
+            .toggle-btn.apps-mode svg {
                 transform: rotate(180deg);
-            }
-
-            /* ===== Fixed portal menu (escapes any overflow) ===== */
-            .apps-menu {
-                position: fixed;
-                min-width: 200px;
-                background: #1a1a1a;
-                border: 1px solid #2c2c2c;
-                border-radius: 10px;
-                box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
-                padding: 6px;
-                opacity: 0;
-                visibility: hidden;
-                transform: translateY(-4px);
-                transition:
-                    opacity 0.18s,
-                    visibility 0.18s,
-                    transform 0.18s;
-                z-index: 99999; /* top-most */
-                pointer-events: none;
-            }
-
-            .apps-menu.open {
-                opacity: 1;
-                visibility: visible;
-                transform: translateY(0);
-                pointer-events: auto;
-            }
-
-            .apps-menu a {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding: 9px 12px;
-                color: #eee;
-                text-decoration: none;
-                font-size: 0.78rem;
-                font-weight: 600;
-                border-radius: 7px;
-                transition: background 0.15s;
-            }
-
-            .apps-menu a:hover {
-                background: #2a2a2a;
-                color: #ff8c00;
-            }
-
-            .apps-menu .divider {
-                height: 1px;
-                background: #2e2e2e;
-                margin: 4px 0;
             }
 
             /* ===== Responsive ===== */
@@ -279,6 +270,11 @@
                 .brand {
                     padding-right: 10px;
                 }
+                .app {
+                    padding: 6px 9px;
+                    font-size: 0.65rem;
+                    max-width: 110px;
+                }
             }
 
             @media (max-width: 480px) {
@@ -292,7 +288,7 @@
                     width: 34px;
                     height: 34px;
                 }
-                .apps-btn {
+                .toggle-btn {
                     padding: 6px 10px;
                     font-size: 0.68rem;
                 }
@@ -315,10 +311,10 @@
                     border-right: none;
                     padding-right: 0;
                 }
-                .apps-btn span {
+                .toggle-btn span {
                     display: none;
                 }
-                .apps-btn {
+                .toggle-btn {
                     padding: 7px;
                     border-radius: 50%;
                 }
@@ -329,7 +325,7 @@
             }
 
             @media (max-width: 300px) {
-                .socials {
+                .strip.socials-mode {
                     display: none;
                 }
             }
@@ -349,76 +345,20 @@
             <!-- Support message -->
             <div class="support-text"><strong>Support the creator</strong> · Let’s connect</div>
 
-            <!-- Socials -->
-            <div class="socials">
-                <a class="social" href="https://facebook.com/chefrelbaracol" target="_blank" rel="noopener" title="Facebook /chefrelbaracol">
-                    <img src="facebook.jpg" alt="" class="avatar" />
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
-                        />
-                    </svg>
-                    <span class="handle">/chefrelbaracol</span>
-                </a>
+            <!-- Strip: toggles between socials and apps -->
+            <div class="strip socials-mode" id="strip"></div>
 
-                <a class="social" href="https://tiktok.com/@chefrelbaracol" target="_blank" rel="noopener" title="TikTok @chefrelbaracol">
-                    <img src="tikotk.jpeg" alt="" class="avatar" />
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                            d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"
-                        />
-                    </svg>
-                    <span class="handle">@chefrelbaracol</span>
-                </a>
-
-                <a class="social" href="mailto:chefrelbarac@gmail.com" title="Email chefrelbarac@gmail.com">
-                    <img src="gmail.jpg" alt="" class="avatar" />
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-                    </svg>
-                    <span class="handle">chefrelbarac@gmail.com</span>
-                </a>
-
-                <a class="social" href="https://github.com/chefbarac" target="_blank" rel="noopener" title="GitHub /chefbarac">
-                    <img src="github.jpg" alt="" class="avatar" />
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                            d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"
-                        />
-                    </svg>
-                    <span class="handle">/chefbarac</span>
-                </a>
-            </div>
-
-            <!-- APPS button only (menu is portaled) -->
-            <div class="apps-dropdown" id="appsDropdown">
-                <button class="apps-btn" type="button" aria-haspopup="true" aria-expanded="false" id="appsBtn">
-                    <span>APPS</span>
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z" /></svg>
-                </button>
-            </div>
-        </div>
-
-        <!-- Menu lives here so it can be moved to body -->
-        <div class="apps-menu" id="appsMenu" role="menu">
-            <a href="https://chefbarac.github.io/iconprint/?source=promo-banner" role="menuitem" target="_blank" rel="noopener">Auto Stitch</a>
-            <a href="https://chefbarac.github.io/iconprint/moreapps/idcopy.html?source=promo-banner" role="menuitem" target="_blank" rel="noopener">ID Copy</a>
-            <a href="https://chefbarac.github.io/iconprint/moreapps/rushid.html?source=promo-banner" role="menuitem" target="_blank" rel="noopener">Rush ID</a>
-            <a href="https://chefbarac.github.io/iconprint/moreapps/photoprint.html?source=promo-banner" role="menuitem" target="_blank" rel="noopener">Photo Print</a>
-            <a href="https://chefbarac.github.io/iconprint/moreapps/b2blamination.html?source=promo-banner" role="menuitem" target="_blank" rel="noopener">B2B Lamination</a>
-            <a href="https://chefbarac.github.io/iconprint/moreapps/autocollage.html?source=promo-banner" role="menuitem" target="_blank" rel="noopener">Auto Collage</a>
-            <div class="divider"></div>
-            <a href="https://chefbarac.github.io/smartcalculator/?source=promo-banner" role="menuitem" target="_blank" rel="noopener">Smart Calcu</a>
-            <a href="https://chefbarac.github.io/costing/?source=promo-banner" role="menuitem" target="_blank" rel="noopener">Costing</a>
-            <a href="https://chefbarac.github.io/pos/?source=promo-banner" role="menuitem" target="_blank" rel="noopener">POS</a>
-            <div class="divider"></div>
-            <a href="#" role="menuitem">More coming soon…</a>
+            <!-- Toggle button -->
+            <button class="toggle-btn" type="button" id="toggleBtn" aria-pressed="false" title="Toggle apps / socials">
+                <span id="toggleLabel">APPS</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z" /></svg>
+            </button>
         </div>
 
         <script>
-            const dropdown = document.getElementById("appsDropdown");
-            const btn = document.getElementById("appsBtn");
-            const menu = document.getElementById("appsMenu");
+            const strip = document.getElementById("strip");
+            const toggleBtn = document.getElementById("toggleBtn");
+            const toggleLabel = document.getElementById("toggleLabel");
             const brandLink = document.getElementById("brandLink");
 
             // Navigate to portfolio when the brand block is clicked
@@ -426,69 +366,80 @@
                 window.open("https://chefbarac.github.io/portfolio/?source=promo-banner", "_blank", "noopener");
             });
 
-            // Portal the menu to <body> so it escapes every overflow:hidden ancestor
-            document.body.appendChild(menu);
+            const socialsHTML = `
+                <a class="social" href="https://facebook.com/chefrelbaracol" target="_blank" rel="noopener" title="Facebook /chefrelbaracol">
+                    <img src="facebook.jpg" alt="" class="avatar" />
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    <span class="handle">/chefrelbaracol</span>
+                </a>
+                <a class="social" href="https://tiktok.com/@chefrelbaracol" target="_blank" rel="noopener" title="TikTok @chefrelbaracol">
+                    <img src="tikotk.jpeg" alt="" class="avatar" />
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+                    </svg>
+                    <span class="handle">@chefrelbaracol</span>
+                </a>
+                <a class="social" href="mailto:chefrelbarac@gmail.com" title="Email chefrelbarac@gmail.com">
+                    <img src="gmail.jpg" alt="" class="avatar" />
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                    </svg>
+                    <span class="handle">chefrelbarac@gmail.com</span>
+                </a>
+                <a class="social" href="https://github.com/chefbarac" target="_blank" rel="noopener" title="GitHub /chefbarac">
+                    <img src="github.jpg" alt="" class="avatar" />
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    <span class="handle">/chefbarac</span>
+                </a>
+            `;
 
-            function positionMenu() {
-                const rect = btn.getBoundingClientRect();
-                const menuHeight = menu.offsetHeight || 320; // approximate if not yet visible
-                const spaceBelow = window.innerHeight - rect.bottom;
-                const spaceAbove = rect.top;
+            const appsHTML = `
+                <a class="app" href="https://chefbarac.github.io/iconprint/?source=promo-banner" target="_blank" rel="noopener" title="Auto Stitch">Auto Stitch</a>
+                <a class="app" href="https://chefbarac.github.io/iconprint/moreapps/idcopy.html?source=promo-banner" target="_blank" rel="noopener" title="ID Copy">ID Copy</a>
+                <a class="app" href="https://chefbarac.github.io/iconprint/moreapps/rushid.html?source=promo-banner" target="_blank" rel="noopener" title="Rush ID">Rush ID</a>
+                <a class="app" href="https://chefbarac.github.io/iconprint/moreapps/photoprint.html?source=promo-banner" target="_blank" rel="noopener" title="Photo Print">Photo Print</a>
+                <a class="app" href="https://chefbarac.github.io/iconprint/moreapps/b2blamination.html?source=promo-banner" target="_blank" rel="noopener" title="B2B Lamination">B2B Lamination</a>
+                <a class="app" href="https://chefbarac.github.io/iconprint/moreapps/autocollage.html?source=promo-banner" target="_blank" rel="noopener" title="Auto Collage">Auto Collage</a>
+                <a class="app" href="https://chefbarac.github.io/smartcalculator/?source=promo-banner" target="_blank" rel="noopener" title="Smart Calcu">Smart Calcu</a>
+                <a class="app" href="https://chefbarac.github.io/costing/?source=promo-banner" target="_blank" rel="noopener" title="Costing">Costing</a>
+                <a class="app" href="https://chefbarac.github.io/pos/?source=promo-banner" target="_blank" rel="noopener" title="POS">POS</a>
+                <span class="app soon" title="More apps coming soon">More soon…</span>
+            `;
 
-                // Prefer opening downward; fall back to upward if not enough room
-                if (spaceBelow >= menuHeight + 12 || spaceBelow >= spaceAbove) {
-                    menu.style.top = rect.bottom + 8 + "px";
-                    menu.style.bottom = "auto";
+            let showingApps = false;
+
+            function render() {
+                if (showingApps) {
+                    strip.innerHTML = appsHTML;
+                    strip.classList.remove("socials-mode");
+                    strip.classList.add("apps-mode");
+                    toggleLabel.textContent = "Socials";
+                    toggleBtn.classList.add("apps-mode");
+                    toggleBtn.setAttribute("aria-pressed", "true");
+                    toggleBtn.title = "Show social links";
                 } else {
-                    menu.style.bottom = window.innerHeight - rect.top + 8 + "px";
-                    menu.style.top = "auto";
+                    strip.innerHTML = socialsHTML;
+                    strip.classList.remove("apps-mode");
+                    strip.classList.add("socials-mode");
+                    toggleLabel.textContent = "APPS";
+                    toggleBtn.classList.remove("apps-mode");
+                    toggleBtn.setAttribute("aria-pressed", "false");
+                    toggleBtn.title = "Show apps";
                 }
-
-                // Align right edge of menu with right edge of button
-                menu.style.left = "auto";
-                menu.style.right = window.innerWidth - rect.right + "px";
             }
 
-            function openMenu() {
-                positionMenu();
-                menu.classList.add("open");
-                dropdown.classList.add("open");
-                btn.setAttribute("aria-expanded", "true");
-            }
-
-            function closeMenu() {
-                menu.classList.remove("open");
-                dropdown.classList.remove("open");
-                btn.setAttribute("aria-expanded", "false");
-            }
-
-            btn.addEventListener("click", (e) => {
+            toggleBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
-                if (menu.classList.contains("open")) {
-                    closeMenu();
-                } else {
-                    openMenu();
-                }
+                showingApps = !showingApps;
+                render();
             });
 
-            // Close on outside click
-            document.addEventListener("click", (e) => {
-                if (!menu.contains(e.target) && !btn.contains(e.target)) {
-                    closeMenu();
-                }
-            });
-
-            // Reposition on resize / scroll
-            window.addEventListener("resize", () => {
-                if (menu.classList.contains("open")) positionMenu();
-            });
-            window.addEventListener(
-                "scroll",
-                () => {
-                    if (menu.classList.contains("open")) positionMenu();
-                },
-                true,
-            );
+            // Initial render
+            render();
 
             // Service worker
             if ("serviceWorker" in navigator) {
