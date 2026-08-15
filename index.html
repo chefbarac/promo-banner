@@ -22,15 +22,15 @@
                 color: #f5f5f5;
                 margin: 0;
                 padding: 0;
-                overflow: hidden;
+                /* overflow removed so the fixed menu can escape the 72 px box */
             }
 
             .banner {
                 display: flex;
                 align-items: center;
                 width: 100%;
-                min-height: 64px;
-                height: 64px;
+                height: 72px;
+                min-height: 72px;
                 background: linear-gradient(90deg, #0d0d0d 0%, #161616 50%, #0d0d0d 100%);
                 border: 1px solid #2a2a2a;
                 border-radius: 12px;
@@ -101,7 +101,8 @@
                 align-items: center;
                 gap: 7px;
                 margin-left: auto;
-                flex-shrink: 0;
+                flex-shrink: 1;
+                min-width: 0;
             }
 
             .social {
@@ -119,6 +120,7 @@
                     background 0.15s,
                     transform 0.15s;
                 white-space: nowrap;
+                flex-shrink: 0;
             }
 
             .social:hover {
@@ -152,8 +154,13 @@
                 text-overflow: ellipsis;
             }
 
-            /* CTA button */
-            .cta {
+            /* ===== APPS button ===== */
+            .apps-dropdown {
+                position: relative;
+                flex-shrink: 0;
+            }
+
+            .apps-btn {
                 display: inline-flex;
                 align-items: center;
                 gap: 5px;
@@ -163,29 +170,85 @@
                 font-size: 0.72rem;
                 padding: 7px 12px;
                 border-radius: 50px;
-                text-decoration: none;
+                border: none;
+                cursor: pointer;
                 white-space: nowrap;
                 box-shadow: 0 3px 12px rgba(255, 140, 0, 0.3);
                 transition:
                     transform 0.15s,
                     box-shadow 0.15s;
-                flex-shrink: 0;
+                font-family: inherit;
             }
 
-            .cta:hover {
+            .apps-btn:hover,
+            .apps-dropdown.open .apps-btn {
                 transform: translateY(-1px);
                 box-shadow: 0 5px 16px rgba(255, 140, 0, 0.4);
             }
 
-            .cta svg {
-                width: 14px;
-                height: 14px;
+            .apps-btn svg {
+                width: 12px;
+                height: 12px;
                 fill: currentColor;
+                transition: transform 0.2s;
             }
 
-            /* ===== Responsive breakpoints ===== */
+            .apps-dropdown.open .apps-btn svg {
+                transform: rotate(180deg);
+            }
 
-            /* Medium: hide support text */
+            /* ===== Fixed portal menu (escapes any overflow) ===== */
+            .apps-menu {
+                position: fixed;
+                min-width: 200px;
+                background: #1a1a1a;
+                border: 1px solid #2c2c2c;
+                border-radius: 10px;
+                box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+                padding: 6px;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-4px);
+                transition:
+                    opacity 0.18s,
+                    visibility 0.18s,
+                    transform 0.18s;
+                z-index: 99999; /* top-most */
+                pointer-events: none;
+            }
+
+            .apps-menu.open {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+                pointer-events: auto;
+            }
+
+            .apps-menu a {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 9px 12px;
+                color: #eee;
+                text-decoration: none;
+                font-size: 0.78rem;
+                font-weight: 600;
+                border-radius: 7px;
+                transition: background 0.15s;
+            }
+
+            .apps-menu a:hover {
+                background: #2a2a2a;
+                color: #ff8c00;
+            }
+
+            .apps-menu .divider {
+                height: 1px;
+                background: #2e2e2e;
+                margin: 4px 0;
+            }
+
+            /* ===== Responsive ===== */
             @media (max-width: 820px) {
                 .support-text {
                     display: none;
@@ -195,7 +258,6 @@
                 }
             }
 
-            /* Narrow: hide handles, keep icons + avatars */
             @media (max-width: 640px) {
                 .social .handle {
                     display: none;
@@ -213,7 +275,6 @@
                 }
             }
 
-            /* Very narrow: smaller logo & name, hide powered text */
             @media (max-width: 480px) {
                 .name-block .powered {
                     display: none;
@@ -225,7 +286,7 @@
                     width: 34px;
                     height: 34px;
                 }
-                .cta {
+                .apps-btn {
                     padding: 6px 10px;
                     font-size: 0.68rem;
                 }
@@ -233,13 +294,13 @@
                     width: 26px;
                     height: 26px;
                 }
-                .banner {
-                    height: 58px;
-                    min-height: 58px;
+
+                .social:nth-child(3),
+                .social:nth-child(4) {
+                    display: none;
                 }
             }
 
-            /* Ultra narrow: only logo + social icons + CTA */
             @media (max-width: 380px) {
                 .name-block {
                     display: none;
@@ -248,12 +309,22 @@
                     border-right: none;
                     padding-right: 0;
                 }
-                .cta span {
+                .apps-btn span {
                     display: none;
                 }
-                .cta {
+                .apps-btn {
                     padding: 7px;
                     border-radius: 50%;
+                }
+
+                .social:nth-child(2) {
+                    display: none;
+                }
+            }
+
+            @media (max-width: 300px) {
+                .socials {
+                    display: none;
                 }
             }
         </style>
@@ -274,7 +345,6 @@
 
             <!-- Socials -->
             <div class="socials">
-                <!-- Facebook -->
                 <a class="social" href="https://facebook.com/chefrelbaracol" target="_blank" rel="noopener" title="Facebook /chefrelbaracol">
                     <img src="facebook.jpg" alt="" class="avatar" />
                     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -285,7 +355,6 @@
                     <span class="handle">/chefrelbaracol</span>
                 </a>
 
-                <!-- TikTok -->
                 <a class="social" href="https://tiktok.com/@chefrelbaracol" target="_blank" rel="noopener" title="TikTok @chefrelbaracol">
                     <img src="tikotk.jpeg" alt="" class="avatar" />
                     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -296,7 +365,6 @@
                     <span class="handle">@chefrelbaracol</span>
                 </a>
 
-                <!-- Email -->
                 <a class="social" href="mailto:chefrelbarac@gmail.com" title="Email chefrelbarac@gmail.com">
                     <img src="gmail.jpg" alt="" class="avatar" />
                     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -305,7 +373,6 @@
                     <span class="handle">chefrelbarac@gmail.com</span>
                 </a>
 
-                <!-- GitHub -->
                 <a class="social" href="https://github.com/chefbarac" target="_blank" rel="noopener" title="GitHub /chefbarac">
                     <img src="github.jpg" alt="" class="avatar" />
                     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -317,13 +384,101 @@
                 </a>
             </div>
 
-            <!-- CTA -->
-            <a href="mailto:chefrelbarac@gmail.com" class="cta" title="Contact / Support">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" /></svg>
-                <span>Contact</span>
-            </a>
+            <!-- APPS button only (menu is portaled) -->
+            <div class="apps-dropdown" id="appsDropdown">
+                <button class="apps-btn" type="button" aria-haspopup="true" aria-expanded="false" id="appsBtn">
+                    <span>APPS</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z" /></svg>
+                </button>
+            </div>
         </div>
+
+        <!-- Menu lives here so it can be moved to body -->
+        <div class="apps-menu" id="appsMenu" role="menu">
+            <a href="https://chefbarac.github.io/iconprint/" role="menuitem" target="_blank" rel="noopener">Auto Stitch</a>
+            <a href="https://chefbarac.github.io/iconprint/moreapps/idcopy.html" role="menuitem" target="_blank" rel="noopener">ID Copy</a>
+            <a href="https://chefbarac.github.io/iconprint/moreapps/rushid.html" role="menuitem" target="_blank" rel="noopener">Rush ID</a>
+            <a href="https://chefbarac.github.io/iconprint/moreapps/photoprint.html" role="menuitem" target="_blank" rel="noopener">Photo Print</a>
+            <a href="https://chefbarac.github.io/iconprint/moreapps/b2blamination.html" role="menuitem" target="_blank" rel="noopener">B2B Lamination</a>
+            <a href="https://chefbarac.github.io/iconprint/moreapps/autocollage.html" role="menuitem" target="_blank" rel="noopener">Auto Collage</a>
+            <div class="divider"></div>
+            <a href="https://chefbarac.github.io/smartcalculator/" role="menuitem" target="_blank" rel="noopener">Smart Calcu</a>
+            <a href="https://chefbarac.github.io/costing/" role="menuitem" target="_blank" rel="noopener">Costing</a>
+            <a href="https://chefbarac.github.io/pos/" role="menuitem" target="_blank" rel="noopener">POS</a>
+            <div class="divider"></div>
+            <a href="#" role="menuitem">More coming soon…</a>
+        </div>
+
         <script>
+            const dropdown = document.getElementById("appsDropdown");
+            const btn = document.getElementById("appsBtn");
+            const menu = document.getElementById("appsMenu");
+
+            // Portal the menu to <body> so it escapes every overflow:hidden ancestor
+            document.body.appendChild(menu);
+
+            function positionMenu() {
+                const rect = btn.getBoundingClientRect();
+                const menuHeight = menu.offsetHeight || 320; // approximate if not yet visible
+                const spaceBelow = window.innerHeight - rect.bottom;
+                const spaceAbove = rect.top;
+
+                // Prefer opening downward; fall back to upward if not enough room
+                if (spaceBelow >= menuHeight + 12 || spaceBelow >= spaceAbove) {
+                    menu.style.top = rect.bottom + 8 + "px";
+                    menu.style.bottom = "auto";
+                } else {
+                    menu.style.bottom = window.innerHeight - rect.top + 8 + "px";
+                    menu.style.top = "auto";
+                }
+
+                // Align right edge of menu with right edge of button
+                menu.style.left = "auto";
+                menu.style.right = window.innerWidth - rect.right + "px";
+            }
+
+            function openMenu() {
+                positionMenu();
+                menu.classList.add("open");
+                dropdown.classList.add("open");
+                btn.setAttribute("aria-expanded", "true");
+            }
+
+            function closeMenu() {
+                menu.classList.remove("open");
+                dropdown.classList.remove("open");
+                btn.setAttribute("aria-expanded", "false");
+            }
+
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                if (menu.classList.contains("open")) {
+                    closeMenu();
+                } else {
+                    openMenu();
+                }
+            });
+
+            // Close on outside click
+            document.addEventListener("click", (e) => {
+                if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                    closeMenu();
+                }
+            });
+
+            // Reposition on resize / scroll
+            window.addEventListener("resize", () => {
+                if (menu.classList.contains("open")) positionMenu();
+            });
+            window.addEventListener(
+                "scroll",
+                () => {
+                    if (menu.classList.contains("open")) positionMenu();
+                },
+                true,
+            );
+
+            // Service worker
             if ("serviceWorker" in navigator) {
                 window.addEventListener("load", () => {
                     navigator.serviceWorker.register("sw.js").catch((err) => {
@@ -331,7 +486,6 @@
                     });
                 });
 
-                // Auto-refresh once when a new SW version takes control.
                 let refreshing = false;
                 navigator.serviceWorker.addEventListener("controllerchange", () => {
                     if (refreshing) return;
