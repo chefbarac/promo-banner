@@ -48,6 +48,12 @@
                 flex-shrink: 0;
                 padding-right: 12px;
                 border-right: 1px solid #2e2e2e;
+                cursor: pointer;
+                transition: opacity 0.15s;
+            }
+
+            .brand:hover {
+                opacity: 0.85;
             }
 
             .logo {
@@ -332,7 +338,7 @@
     <body>
         <div class="banner">
             <!-- Brand -->
-            <div class="brand">
+            <div class="brand" id="brandLink" title="View portfolio">
                 <img src="icon print circle copy.png" alt="Icon Print" class="logo" />
                 <div class="name-block">
                     <h1>CHEFREL BARACOL</h1>
@@ -395,16 +401,16 @@
 
         <!-- Menu lives here so it can be moved to body -->
         <div class="apps-menu" id="appsMenu" role="menu">
-            <a href="https://chefbarac.github.io/iconprint/" role="menuitem" target="_blank" rel="noopener">Auto Stitch</a>
-            <a href="https://chefbarac.github.io/iconprint/moreapps/idcopy.html" role="menuitem" target="_blank" rel="noopener">ID Copy</a>
-            <a href="https://chefbarac.github.io/iconprint/moreapps/rushid.html" role="menuitem" target="_blank" rel="noopener">Rush ID</a>
-            <a href="https://chefbarac.github.io/iconprint/moreapps/photoprint.html" role="menuitem" target="_blank" rel="noopener">Photo Print</a>
-            <a href="https://chefbarac.github.io/iconprint/moreapps/b2blamination.html" role="menuitem" target="_blank" rel="noopener">B2B Lamination</a>
-            <a href="https://chefbarac.github.io/iconprint/moreapps/autocollage.html" role="menuitem" target="_blank" rel="noopener">Auto Collage</a>
+            <a href="https://chefbarac.github.io/iconprint/?source=promo-banner" role="menuitem" target="_blank" rel="noopener">Auto Stitch</a>
+            <a href="https://chefbarac.github.io/iconprint/moreapps/idcopy.html?source=promo-banner" role="menuitem" target="_blank" rel="noopener">ID Copy</a>
+            <a href="https://chefbarac.github.io/iconprint/moreapps/rushid.html?source=promo-banner" role="menuitem" target="_blank" rel="noopener">Rush ID</a>
+            <a href="https://chefbarac.github.io/iconprint/moreapps/photoprint.html?source=promo-banner" role="menuitem" target="_blank" rel="noopener">Photo Print</a>
+            <a href="https://chefbarac.github.io/iconprint/moreapps/b2blamination.html?source=promo-banner" role="menuitem" target="_blank" rel="noopener">B2B Lamination</a>
+            <a href="https://chefbarac.github.io/iconprint/moreapps/autocollage.html?source=promo-banner" role="menuitem" target="_blank" rel="noopener">Auto Collage</a>
             <div class="divider"></div>
-            <a href="https://chefbarac.github.io/smartcalculator/" role="menuitem" target="_blank" rel="noopener">Smart Calcu</a>
-            <a href="https://chefbarac.github.io/costing/" role="menuitem" target="_blank" rel="noopener">Costing</a>
-            <a href="https://chefbarac.github.io/pos/" role="menuitem" target="_blank" rel="noopener">POS</a>
+            <a href="https://chefbarac.github.io/smartcalculator/?source=promo-banner" role="menuitem" target="_blank" rel="noopener">Smart Calcu</a>
+            <a href="https://chefbarac.github.io/costing/?source=promo-banner" role="menuitem" target="_blank" rel="noopener">Costing</a>
+            <a href="https://chefbarac.github.io/pos/?source=promo-banner" role="menuitem" target="_blank" rel="noopener">POS</a>
             <div class="divider"></div>
             <a href="#" role="menuitem">More coming soon…</a>
         </div>
@@ -413,6 +419,12 @@
             const dropdown = document.getElementById("appsDropdown");
             const btn = document.getElementById("appsBtn");
             const menu = document.getElementById("appsMenu");
+            const brandLink = document.getElementById("brandLink");
+
+            // Navigate to portfolio when the brand block is clicked
+            brandLink.addEventListener("click", () => {
+                window.open("https://chefbarac.github.io/portfolio/?source=promo-banner", "_blank", "noopener");
+            });
 
             // Portal the menu to <body> so it escapes every overflow:hidden ancestor
             document.body.appendChild(menu);
