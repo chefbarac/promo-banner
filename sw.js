@@ -1,5 +1,5 @@
 const PREFIX = 'promo-banner-cache';
-const CACHE_NAME = PREFIX + '-v1.0.6';
+const CACHE_NAME = PREFIX + '-v1.0.7';
 const PRECACHE_URLS = [
     './',
 ];
