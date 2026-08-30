@@ -510,7 +510,19 @@
             };
 
             /* =========================================================
-               3. ACTIVE-CAMPAIGN SELECTION + ROTATION
+               3. ACTIVE-CAMPAIGN SELECTION + FULL ROTATION
+               =========================================================
+               Rotation pool (in order):
+                 • each active paid campaign
+                 • house campaign
+                 • apps strip
+                 • socials strip
+
+               Frequency: one advance per page load / visit.
+               Index is stored in localStorage so repeat visitors
+               cycle evenly through the pool over time. No timer
+               and no time-of-day logic — keeps it fair, lightweight,
+               and free of mid-session jumps.
                ========================================================= */
             function isCampaignActiveToday(c) {
                 if (!c.active) return false;
@@ -524,23 +536,32 @@
                 return campaigns.filter(isCampaignActiveToday).map((c) => ({ ...c, type: c.type || "paid" }));
             }
 
-            // Simple round-robin rotation, persisted in localStorage so
-            // repeat visitors see a fair, evenly-distributed sequence
-            // of advertisers over time (see explanation for why this
-            // beats pure random or a setInterval-based timed rotation
-            // for a small single-slot inventory).
-            function pickCampaign(list) {
-                if (!list.length) return houseCampaign;
-                if (list.length === 1) return list[0];
+            function getRotationSlots() {
+                const active = getActiveCampaigns();
+                const slots = active.map((c) => ({ kind: "campaign", campaign: c }));
+                // Always include house, apps, and socials so they still rotate
+                // even when paid inventory is empty or not yet started.
+                slots.push({ kind: "campaign", campaign: houseCampaign });
+                slots.push({ kind: "apps" });
+                slots.push({ kind: "socials" });
+                return slots;
+            }
+
+            function pickSlot(list) {
+                if (!list.length) {
+                    return { kind: "campaign", campaign: houseCampaign };
+                }
                 const key = "promoRotationIndex";
                 let idx = parseInt(localStorage.getItem(key) || "0", 10);
                 if (isNaN(idx) || idx < 0) idx = 0;
-                const campaign = list[idx % list.length];
+                const slot = list[idx % list.length];
                 localStorage.setItem(key, String((idx + 1) % list.length));
-                return campaign;
+                return slot;
             }
 
-            const currentCampaign = pickCampaign(getActiveCampaigns());
+            const currentSlot = pickSlot(getRotationSlots());
+            // Convenience: the campaign object when the slot is an ad, else null
+            const currentCampaign = currentSlot.kind === "campaign" ? currentSlot.campaign : null;
 
             /* =========================================================
                4. UTM HELPER
@@ -634,8 +655,10 @@
                 `;
             }
 
+            // Modes the toggle can cycle through (manual override)
             const MODES = ["ad", "apps", "socials"];
-            let modeIndex = 0; // start on "ad"
+            // Initial mode follows the rotated slot
+            let modeIndex = currentSlot.kind === "apps" ? 1 : currentSlot.kind === "socials" ? 2 : 0;
             let impressionObserver = null;
             let impressionFired = false;
 
@@ -696,21 +719,22 @@
                 });
             }
 
-            function renderAd() {
-                strip.innerHTML = adHTML(currentCampaign);
+            function renderAd(campaign) {
+                const c = campaign || currentCampaign || houseCampaign;
+                strip.innerHTML = adHTML(c);
                 const adLink = document.getElementById("adLink");
                 adLink.addEventListener("click", (e) => {
                     e.preventDefault();
                     trackEvent("promo_click", {
-                        campaign_id: currentCampaign.id,
-                        advertiser: currentCampaign.advertiser,
+                        campaign_id: c.id,
+                        advertiser: c.advertiser,
                         placement: "promo-banner",
-                        destination: currentCampaign.url,
-                        campaign_type: currentCampaign.type,
+                        destination: c.url,
+                        campaign_type: c.type,
                     });
-                    window.open(withUTM(currentCampaign), "_blank", "noopener");
+                    window.open(withUTM(c), "_blank", "noopener");
                 });
-                startImpressionTracking(adLink, currentCampaign);
+                startImpressionTracking(adLink, c);
             }
 
             function render() {
@@ -721,7 +745,8 @@
 
                 if (mode === "ad") {
                     strip.classList.add("ad-mode");
-                    renderAd();
+                    // Prefer the rotated campaign; fall back to house if somehow missing
+                    renderAd(currentCampaign || houseCampaign);
                 } else if (mode === "apps") {
                     strip.classList.add("apps-mode");
                     strip.innerHTML = appsHTML;
